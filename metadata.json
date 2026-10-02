@@ -1,0 +1,6 @@
+{
+  "name": "Elyzareth OS",
+  "description": "Architectural OS shell and governance pipeline for musical creation, forensic verification, and release locking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
