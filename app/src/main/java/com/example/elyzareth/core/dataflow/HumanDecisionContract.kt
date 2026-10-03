@@ -34,4 +34,32 @@ interface HumanDecisionContract {
         officerId: String,
         notes: String
     ): Result<Unit>
+
+    /**
+     * Records an explicit human approval for a pipeline stage transition.
+     */
+    suspend fun approveStageTransition(
+        stage: PipelineStage,
+        userId: String,
+        notes: String
+    ): Result<Unit>
+
+    /**
+     * Records an explicit human rejection for a pipeline stage transition.
+     */
+    suspend fun rejectStageTransition(
+        stage: PipelineStage,
+        userId: String,
+        reason: String
+    ): Result<Unit>
+
+    /**
+     * Checks if an active human veto exists for the given stage.
+     */
+    fun hasActiveVeto(stage: PipelineStage): Boolean
+
+    /**
+     * Checks if human approval has been recorded for the given stage.
+     */
+    fun isStageApproved(stage: PipelineStage): Boolean
 }

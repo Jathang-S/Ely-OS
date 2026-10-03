@@ -3,9 +3,11 @@ package com.example.elyzareth.shell.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.elyzareth.core.dataflow.CurationDataFlow
 import com.example.elyzareth.core.dataflow.CreativeDnaDataFlow
+import com.example.elyzareth.core.dataflow.ElyzarethHumanDecisionAuthority
 import com.example.elyzareth.core.dataflow.EvidenceDataFlow
 import com.example.elyzareth.core.dataflow.ForensicScannerDataFlow
 import com.example.elyzareth.core.dataflow.GateVerificationDataFlow
+import com.example.elyzareth.core.dataflow.HumanDecisionContract
 import com.example.elyzareth.core.dataflow.IdeaDataFlow
 import com.example.elyzareth.core.dataflow.LyricGenerationDataFlow
 import com.example.elyzareth.core.dataflow.MasterPlayerDataFlow
@@ -13,7 +15,11 @@ import com.example.elyzareth.core.dataflow.PipelineDataFlowDescriptor
 import com.example.elyzareth.core.dataflow.ProductionDataFlow
 import com.example.elyzareth.core.dataflow.ReleaseLockDataFlow
 import com.example.elyzareth.core.dataflow.StyleAndVisualDataFlow
+import com.example.elyzareth.core.governor.ElyzarethGovernorEngine
+import com.example.elyzareth.core.governor.GovernorContract
 import com.example.elyzareth.core.governor.PipelineState
+import com.example.elyzareth.core.ledger.EvidenceLedger
+import com.example.elyzareth.core.ledger.InMemoryEvidenceLedger
 import com.example.elyzareth.core.model.GateLevel
 import com.example.elyzareth.core.model.GateStatus
 import com.example.elyzareth.core.model.PipelineStage
@@ -27,8 +33,19 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class GovernorShellViewModel : ViewModel() {
 
-    private val _pipelineState = MutableStateFlow(PipelineState.initial())
-    val pipelineState: StateFlow<PipelineState> = _pipelineState.asStateFlow()
+    val evidenceLedger: EvidenceLedger = InMemoryEvidenceLedger()
+    val humanAuthority: HumanDecisionContract = ElyzarethHumanDecisionAuthority(
+        projectId = "elyzareth_demo_project",
+        evidenceLedger = evidenceLedger
+    )
+    val governor: GovernorContract = ElyzarethGovernorEngine(
+        projectId = "elyzareth_demo_project",
+        projectTitle = "Elyzareth Master Pipeline",
+        humanDecisionAuthority = humanAuthority,
+        evidenceLedger = evidenceLedger
+    )
+
+    val pipelineState: StateFlow<PipelineState> = governor.pipelineState
 
     private val _selectedStage = MutableStateFlow(PipelineStage.IDEA)
     val selectedStage: StateFlow<PipelineStage> = _selectedStage.asStateFlow()
