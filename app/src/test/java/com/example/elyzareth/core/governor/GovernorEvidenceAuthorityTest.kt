@@ -1,4 +1,4 @@
-package com.example.elyzareth
+package com.example.elyzareth.core.governor
 
 import com.example.elyzareth.core.dataflow.ElyzarethHumanDecisionAuthority
 import com.example.elyzareth.core.governor.ElyzarethGovernorEngine
