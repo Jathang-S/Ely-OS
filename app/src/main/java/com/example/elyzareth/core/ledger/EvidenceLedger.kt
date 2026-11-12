@@ -38,7 +38,12 @@ interface EvidenceLedger {
     fun size(): Int
 
     /**
-     * Clears in-memory ledger records (used for isolated testing environments).
+     * Verifies the cryptographic hash chain and structural invariants of all records in the ledger.
      */
-    fun clear()
+    fun verifyChainIntegrity(): Boolean
+
+    /**
+     * Returns the recordHash of the latest committed evidence entry, or GENESIS_RECORD_HASH if empty.
+     */
+    fun getLatestRecordHash(): String
 }

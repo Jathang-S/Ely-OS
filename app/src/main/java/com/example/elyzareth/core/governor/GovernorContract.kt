@@ -1,6 +1,7 @@
 package com.example.elyzareth.core.governor
 
 import com.example.elyzareth.core.model.GateLevel
+import com.example.elyzareth.core.model.GateCriterionCheck
 import com.example.elyzareth.core.model.GateVerificationRecord
 import com.example.elyzareth.core.model.HumanSignOff
 import com.example.elyzareth.core.model.PipelineStage
@@ -39,10 +40,36 @@ interface GovernorContract {
     suspend fun evaluateGate(gate: GateLevel): Result<GateVerificationRecord>
 
     /**
+     * Evaluates a gate using an explicit, non-empty set of criterion results.
+     * The no-argument overload must fail closed rather than fabricate an empty evaluation.
+     */
+    suspend fun evaluateGate(
+        gate: GateLevel,
+        criteriaResults: List<GateCriterionCheck>
+    ): Result<GateVerificationRecord>
+
+    /**
      * Human Authority Sign-Off for a gate.
      * Gates can NEVER be marked as APPROVED without explicit human sign-off.
      */
     suspend fun submitHumanGateSignOff(gate: GateLevel, signOff: HumanSignOff): Result<GateVerificationRecord>
+
+    /** Records a human rejection and atomically publishes the gate's REJECTED state. */
+    suspend fun rejectHumanGatePassage(
+        gate: GateLevel,
+        officerId: String,
+        reason: String
+    ): Result<GateVerificationRecord>
+
+    /**
+     * Opens a new human review cycle for a previously vetoed or rejected stage or gate,
+     * atomically reconciling both HumanDecisionAuthority state and GovernorSnapshot.
+     */
+    suspend fun openNewReviewCycle(
+        stage: PipelineStage,
+        userId: String,
+        resolutionNotes: String
+    ): Result<Unit>
 
     /**
      * Seals Gate 5 and generates the cryptographic ReleasePackage.
